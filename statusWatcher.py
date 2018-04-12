@@ -80,7 +80,7 @@ class ServerStatus:
             # Sending notification
             self.send_notification(error_msg)
         else:
-            error_msg = '*Server ' +  socket.gethostname() + '* is running.'
+            error_msg = ':info: *Server ' +  socket.gethostname() + '* is running.'
             if self.send_status_info:
                 error_msg += self.get_status_info()
             if not self.send_notification_only_on_error:
@@ -118,12 +118,12 @@ class ServerStatus:
 
     def get_status_info(self):
         status_msg = "\n *Status* \n"
-        status_msg += '*CPU* : ' + str(psutil.cpu_percent(interval=2)) + "\n"
+        status_msg += ':gear: *CPU* : ' + str(psutil.cpu_percent(interval=2)) + "\n"
         memory = psutil.virtual_memory()
-        status_msg += '*RAM* : ' + str(round(memory.used/float(2**30), 2)) + ' of ' + str(round(memory.total/float(2**30))) + "\n"
-        status_msg += '*Load* : ' + str(os.getloadavg()) + ' of max ' + str(multiprocessing.cpu_count()) + "\n"
+        status_msg += ':chart_with_upwards_trend: *RAM* : ' + str(round(memory.used/float(2**30), 2)) + 'GB of ' + str(round(memory.total/float(2**30))) + "GB \n"
+        status_msg += ':bar_chart: *Load* : ' + str(os.getloadavg()) + ' of max ' + str(multiprocessing.cpu_count()) + "\n"
         total, used, free = shutil.disk_usage('/')
-        status_msg += '*Disk usage* : _Used_ : ' + str(used // (2**30)) + 'GB _Free_ : ' + str(free // (2**30)) + \
+        status_msg += ':card_file_box: *Disk usage* : _Used_ : ' + str(used // (2**30)) + 'GB _Free_ : ' + str(free // (2**30)) + \
                       'GB _Total_ : ' + str(total // (2**30)) + "GB\n"
         return status_msg
 
