@@ -14,13 +14,14 @@ import subprocess
 from datetime import datetime, timedelta
 from time import sleep
 from slackclient import SlackClient
-import os
+import os,socket
 
 
 class ServerStatus:
     # Toggles
-    relaunch_toggle = False
+    relaunch_toggle = True
     allow_ping = True
+    send_notification_only_on_error = False
 
     # Internal variable.  DO NOT EDIT
     relaunch_status = False
@@ -39,7 +40,8 @@ class ServerStatus:
             failing_units = int(failing_process.stdout.read().decode('UTF-8').strip())
             failing_process.stdout.close()
             if failing_units == 0:
-                error_msg = '@canal :bangbang: System is unstable but I don\'t detect any failed service.\n\nCurrent status is «' + status + '»'
+                error_msg = '@canal :bangbang: *System is unstable* but I don\'t detect any failed service.\n\n' \
+                            'Current status is «' + status + '»'
             else:
                 error_msg = '@david :bangbang: *Server is unstable* '+"\n"
                 failed_process = subprocess.Popen("systemctl --failed | grep failed | awk '{print $2}'", shell=True,
@@ -70,8 +72,13 @@ class ServerStatus:
                     else:
                         error_msg += '- ' + unit + "\n"
 
-            # Sending email
+            # Sending notification
             self.send_notification(error_msg)
+        else:
+            error_msg = '*Server ' +  socket.gethostname() + '* is running.'
+            if not self.send_notification_only_on_error:
+                self.send_notification(error_msg)
+
 
     @staticmethod
     def get_log_for_unit(unit):
