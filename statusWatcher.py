@@ -20,6 +20,7 @@ import os
 class ServerStatus:
     # Toggles
     relaunch_toggle = False
+    allow_ping = True
 
     # Internal variable.  DO NOT EDIT
     relaunch_status = False
@@ -105,7 +106,7 @@ class ServerStatus:
         slack_token = os.environ["SLACK_API_TOKEN"]
         slack = SlackClient(slack_token)
 
-        print(slack.api_call("chat.postMessage", channel="#devnotif", text=message))
+        print(slack.api_call("chat.postMessage", link_names=int(self.allow_ping), channel="#devnotif", text=message))
 
 
 def main():
