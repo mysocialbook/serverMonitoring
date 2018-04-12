@@ -100,7 +100,6 @@ class ServerStatus:
         return relaunch_message
 
     def send_notification(self, message):
-        os.environ["SLACK_API_TOKEN"] = "xoxp-3698854391-107606420737-346544403318-92ae1b7b46d031576e8dac4cb2c94ae0"
         slack_token = os.environ["SLACK_API_TOKEN"]
         slack = SlackClient(slack_token)
 
