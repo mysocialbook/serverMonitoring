@@ -120,10 +120,11 @@ class ServerStatus:
         status_msg = "\n *Status* \n"
         status_msg += '*CPU* : ' + str(psutil.cpu_percent(interval=2)) + "\n"
         memory = psutil.virtual_memory()
-        status_msg += '*RAM* : ' + str(memory.used/float(2**30)) + ' of ' + str(memory.total/float(20**30)) + "\n"
+        status_msg += '*RAM* : ' + str(round(memory.used/float(2**30), 2)) + ' of ' + str(round(memory.total/float(2**30))) + "\n"
         status_msg += '*Load* : ' + str(os.getloadavg()) + ' of max ' + str(multiprocessing.cpu_count()) + "\n"
         total, used, free = shutil.disk_usage('/')
-        status_msg += '*Disk usage* : _Used_ : ' + str(used // (2**30)) + 'GB _Free_ : ' + str(free // (2**30)) + 'GB _Total_ : ' + str(total // (2**30)) + "GB\n"
+        status_msg += '*Disk usage* : _Used_ : ' + str(used // (2**30)) + 'GB _Free_ : ' + str(free // (2**30)) + \
+                      'GB _Total_ : ' + str(total // (2**30)) + "GB\n"
         return status_msg
 
     def send_notification(self, message):
