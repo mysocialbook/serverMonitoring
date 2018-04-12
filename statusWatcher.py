@@ -1,3 +1,4 @@
+# coding=utf-8
 """
     This code reuse part of the server-tools by David Lumaye, code available here
     https://github.com/chindit/server-tools
@@ -37,14 +38,15 @@ class ServerStatus:
             failing_units = int(failing_process.stdout.read().decode('UTF-8').strip())
             failing_process.stdout.close()
             if failing_units == 0:
-                error_msg = 'System is unstable but I don\'t detect any failed service.\n\nCurrent status is «' + status + '»'
+                error_msg = '@canal :bangbang: System is unstable but I don\'t detect any failed service.\n\nCurrent status is «' + status + '»'
             else:
+                error_msg = '@david :bangbang: *Server is unstable* '+"\n"
                 failed_process = subprocess.Popen("systemctl --failed | grep failed | awk '{print $2}'", shell=True,
                                                   stdout=subprocess.PIPE)
                 failed_units = failed_process.stdout.read().decode('UTF-8').strip()
                 failed_process.stdout.close()
                 failed_units = failed_units.split('\n')
-                error_msg = str(failing_units) + " failed services have been found.\n\n"
+                error_msg += str(failing_units) + " failed services have been found.\n\n"
                 error_msg += 'Following units are in «failed» state:\n'
 
                 for unit in failed_units:
