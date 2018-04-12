@@ -14,14 +14,17 @@ import subprocess
 from datetime import datetime, timedelta
 from time import sleep
 from slackclient import SlackClient
-import os,socket
+import os, socket, psutil, multiprocessing, shutil
 
 
 class ServerStatus:
-    # Toggles
-    relaunch_toggle = True
-    allow_ping = True
-    send_notification_only_on_error = False
+    """
+        TOGGLES
+    """
+    relaunch_toggle = True  # If True, failed services will be automatically reloaded
+    allow_ping = True  # Allow @canal ping in Slack messages
+    send_notification_only_on_error = False  # Send a notification even if everything is OK
+    send_status_info = True  # Send information about server (CPU, RAM and Load Average)
 
     # Internal variable.  DO NOT EDIT
     relaunch_status = False
@@ -72,10 +75,14 @@ class ServerStatus:
                     else:
                         error_msg += '- ' + unit + "\n"
 
+            if self.send_status_info:
+                error_msg += self.get_status_info()
             # Sending notification
             self.send_notification(error_msg)
         else:
             error_msg = '*Server ' +  socket.gethostname() + '* is running.'
+            if self.send_status_info:
+                error_msg += self.get_status_info()
             if not self.send_notification_only_on_error:
                 self.send_notification(error_msg)
 
@@ -108,6 +115,15 @@ class ServerStatus:
             self.relaunch_status = True
         unit_status_process.stdout.close()
         return relaunch_message
+
+    def get_status_info(self):
+        status_msg = "\n *Status* \n"
+        status_msg += '*CPU* : ' + psutil.cpu_percent() + "\n"
+        status_msg += '*RAM* : ' + psutil.virtual_memory() + "\n"
+        status_msg += '*Load* : ' + os.getloadavg() + ' of max ' + multiprocessing.cpu_count() + "\n"
+        total, used, free = shutil.disk_usage('/')
+        status_msg += '*Disk usage* : _Used_ : ' + (used // (2**30)) + ' _Free_ : ' + (free // (2**30)) + ' _Total_ : ' + (total // (2**30)) + "\n"
+        return status_msg
 
     def send_notification(self, message):
         slack_token = os.environ["SLACK_API_TOKEN"]
