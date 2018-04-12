@@ -118,9 +118,9 @@ class ServerStatus:
 
     def get_status_info(self):
         status_msg = "\n *Status* \n"
-        status_msg += '*CPU* : ' + str(psutil.cpu_percent()) + "\n"
+        status_msg += '*CPU* : ' + str(psutil.cpu_percent(interval=2)) + "\n"
         memory = psutil.virtual_memory()
-        status_msg += '*RAM* : ' + str(memory.used // (2**30)) + ' of ' + str(memory.total // (2**30)) + "\n"
+        status_msg += '*RAM* : ' + str(memory.used) + ' of ' + str(memory.total) + "\n"
         status_msg += '*Load* : ' + str(os.getloadavg()) + ' of max ' + str(multiprocessing.cpu_count()) + "\n"
         total, used, free = shutil.disk_usage('/')
         status_msg += '*Disk usage* : _Used_ : ' + str(used // (2**30)) + 'GB _Free_ : ' + str(free // (2**30)) + 'GB _Total_ : ' + str(total // (2**30)) + "GB\n"
