@@ -25,7 +25,7 @@ from time import sleep
 from Notifications.Slack import SlackNotification
 
 
-class ServerStatus:
+class ServicesMonitoring:
     # Internal variable.  DO NOT EDIT
     relaunch_status = False
     overall_status = True
