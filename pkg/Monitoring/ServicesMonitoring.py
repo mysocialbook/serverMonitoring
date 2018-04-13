@@ -1,5 +1,11 @@
 # coding=utf-8
 """
+    This script monitor the status of all services and, if one is detected as «failed»
+    will try to relaunch it.
+    Whatever the relaunch status is, a notification will be sent.
+    If relaunch has failed, logs of failed service are retrieved and sent as part of message
+
+
     This code reuse part of the server-tools by David Lumaye, code available here
     https://github.com/chindit/server-tools
     In order to respect the license of this tool, this code MUST
@@ -10,27 +16,21 @@
     If you don't want to respect any of these points, please rewrite this tool immediately !
 """
 
+import socket
 import subprocess
 from datetime import datetime, timedelta
 from time import sleep
-from slackclient import SlackClient
-import os, socket, psutil, multiprocessing, shutil
+
+# Import custom classes
+from Notifications.Slack import SlackNotification
 
 
 class ServerStatus:
-    """
-        TOGGLES
-    """
-    relaunch_toggle = True  # If True, failed services will be automatically reloaded
-    allow_ping = True  # Allow @canal ping in Slack messages
-    send_notification_only_on_error = False  # Send a notification even if everything is OK
-    send_status_info = True  # Send information about server (CPU, RAM and Load Average)
-
     # Internal variable.  DO NOT EDIT
     relaunch_status = False
     overall_status = True
 
-    def __init__(self):
+    def __init__(self, config):
         # Call for general status
         main_process = subprocess.Popen("systemctl status | grep State: | head -1 | awk '{print $2}'", shell=True,
                                         stdout=subprocess.PIPE)
@@ -46,7 +46,7 @@ class ServerStatus:
                 error_msg = '@canal :bangbang: *System is unstable* but I don\'t detect any failed service.\n\n' \
                             'Current status is «' + status + '»'
             else:
-                error_msg = '@david :bangbang: *Server is unstable* '+"\n"
+                error_msg = '@canal :bangbang: *Server is unstable* '+"\n"
                 failed_process = subprocess.Popen("systemctl --failed | grep failed | awk '{print $2}'", shell=True,
                                                   stdout=subprocess.PIPE)
                 failed_units = failed_process.stdout.read().decode('UTF-8').strip()
@@ -55,8 +55,12 @@ class ServerStatus:
                 error_msg += str(failing_units) + " failed services have been found.\n\n"
                 error_msg += 'Following units are in «failed» state:\n'
 
+                relaunch_toggle = False
+                if 'RelaunchJobs' in config and config['RelaunchJobs'] == 'yes':
+                    relaunch_toggle = True
+
                 for unit in failed_units:
-                    if self.relaunch_toggle:
+                    if relaunch_toggle:
                         # Attempting unit restart
                         result = self.relaunch_unit(unit)
                         if self.relaunch_status:
@@ -75,16 +79,8 @@ class ServerStatus:
                     else:
                         error_msg += '- ' + unit + "\n"
 
-            if self.send_status_info:
-                error_msg += self.get_status_info()
             # Sending notification
             self.send_notification(error_msg)
-        else:
-            error_msg = ':info: *Server ' +  socket.gethostname() + '* is running.'
-            if self.send_status_info:
-                error_msg += self.get_status_info()
-            if not self.send_notification_only_on_error:
-                self.send_notification(error_msg)
 
 
     @staticmethod
@@ -116,27 +112,6 @@ class ServerStatus:
         unit_status_process.stdout.close()
         return relaunch_message
 
-    def get_status_info(self):
-        status_msg = "\n *Status* \n"
-        status_msg += ':gear: *CPU* : ' + str(psutil.cpu_percent(interval=2)) + "\n"
-        memory = psutil.virtual_memory()
-        status_msg += ':chart_with_upwards_trend: *RAM* : ' + str(round(memory.used/float(2**30), 2)) + 'GB of ' + str(round(memory.total/float(2**30))) + "GB \n"
-        status_msg += ':bar_chart: *Load* : ' + str(os.getloadavg()) + ' of max ' + str(multiprocessing.cpu_count()) + "\n"
-        total, used, free = shutil.disk_usage('/')
-        status_msg += ':card_file_box: *Disk usage* : _Used_ : ' + str(used // (2**30)) + 'GB _Free_ : ' + str(free // (2**30)) + \
-                      'GB _Total_ : ' + str(total // (2**30)) + "GB\n"
-        return status_msg
-
     def send_notification(self, message):
-        slack_token = os.environ["SLACK_API_TOKEN"]
-        slack = SlackClient(slack_token)
-
-        print(slack.api_call("chat.postMessage", link_names=int(self.allow_ping), channel="#devnotif", text=message))
-
-
-def main():
-    ServerStatus()
-
-
-if __name__ == "__main__":
-    main()
+        slack = SlackNotification()
+        print(slack.pingCanal(message, 'devnotif'))

@@ -8,7 +8,7 @@
 
 1) Make sure you are using Python 3 and not Python 2
 
-2) Install *pip* `sudo apt-get install python-pip`
+2) Install *pip* `sudo apt-get install python3-pip`
 
 3) Install following packages via *pip*
-    `slackclient`
+    `psutil`, `slackclient`
