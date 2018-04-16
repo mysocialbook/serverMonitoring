@@ -1,7 +1,7 @@
 import os
 
 from Notifications.Slack import Slack
-form Notifications.SES import SES
+from Notifications.SES import SES
 from Tools.ConfigLoader import ConfigLoader
 
 class NotificationManager:
