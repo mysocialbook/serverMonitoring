@@ -29,7 +29,9 @@ class ServicesMonitoring:
     relaunch_status = False
     overall_status = True
 
-    def __init__(self, config):
+    def __init__(self, config, notifier):
+        self.notifier = notifier
+
         # Call for general status
         main_process = subprocess.Popen("systemctl status | grep State: | head -1 | awk '{print $2}'", shell=True,
                                         stdout=subprocess.PIPE)
@@ -79,8 +81,7 @@ class ServicesMonitoring:
                         error_msg += '- ' + unit + "\n"
 
             # Sending notification
-            notification = NotificationManager()
-            notification.send_notification(error_msg)
+            self.notifier.send_notification(error_msg)
 
 
     @staticmethod

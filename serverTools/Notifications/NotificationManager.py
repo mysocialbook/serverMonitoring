@@ -2,23 +2,23 @@ import os
 
 from Notifications.Slack import Slack
 from Notifications.SES import SES
-from Tools.ConfigLoader import ConfigLoader
 
 class NotificationManager:
-    def __init__(self):
-        self.config = ConfigLoader().get_section('Notifications')
+    def __init__(self, config):
+        self.config = config
+        self.notifications = self.config.get_section('Notifications')
 
-        if 'Slack' in self.config['Notifications']:
-            self.slack = Slack(ConfigLoader().get_section('Slack'))
-        if 'SES' in self.config['Notifications']:
-            self.ses = SES(ConfigLoader().get_section('SES'))
+        if 'Slack' in self.notifications['Notifications']:
+            self.slack = Slack(self.config.get_section('Slack'))
+        if 'SES' in self.notifications['Notifications']:
+            self.ses = SES(self.config.get_section('SES'))
 
     def send_notification(self, message):
         sent = False
-        if 'Slack' in self.config['Notifications']:
+        if 'Slack' in self.notifications['Notifications']:
             self.slack.ping_channel(message)
             sent = True
-        elif 'SES' in self.config['Notifications']:
+        elif 'SES' in self.notifications['Notifications']:
             self.ses.send_mail(message)
             sent = True
 

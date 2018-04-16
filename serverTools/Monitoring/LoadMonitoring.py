@@ -8,12 +8,13 @@ import os
 import socket
 
 from Tools.System import System
-from Notifications.NotificationManager import NotificationManager
 
 
 class LoadMonitoring:
 
-    def __init__(self, config):
+    def __init__(self, config, notifier):
+        self.notifier = notifier
+
         # Check disk space
         if System.get_free_disk_space('/') < (System.get_total_disk_space('/')/5):
             self.trigger_alarm('*Disk space* is too low.  Only ' + str(System.get_free_disk_space('/') // (2**30)) +
@@ -23,14 +24,13 @@ class LoadMonitoring:
         if five_minutes > System.get_cpu_count():
             self.trigger_alarm('*Overload detected*  Load of ' + str(five_minutes) + ' for max of ' + str(System.get_cpu_count()))
 
-        if 'SendNotificationIfNoError' in config and config['SendNotificationIfNoError'] == 'yes':
+        if 'SendNotificationIfNoError' in config and bool(config['SendNotificationIfNoError']):
             self.display_status_message()
 
     def display_status_message(self):
         message = ':info: *Server ' + socket.gethostname() + '*'
         message += self.get_status_message()
-        notification = NotificationManager()
-        notification.send_notification(message)
+        self.notifier.send_notification(message)
 
     def get_status_message(self):
         status_msg = "\n *Status* \n"
@@ -45,5 +45,4 @@ class LoadMonitoring:
 
     def trigger_alarm(self, message):
         message = ':warn: *Server ' + socket.gethostname() + '* is in danger zone ' + message
-        notification = NotificationManager()
-        notification.send_notification(message)
+        self.notifier.send_notification(message)
