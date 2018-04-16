@@ -20,7 +20,7 @@ class Slack:
             self.default_channel = config['DefaultChannel']
         self.allow_ping = bool(config['AllowPing'])
 
-    def ping_canal(self, message, channel=''):
+    def ping_channel(self, message, channel=''):
         if channel == '':
             channel = self.default_channel
         if channel[0] != '#':
