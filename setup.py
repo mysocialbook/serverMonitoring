@@ -33,7 +33,7 @@ setup(
     ],
     keywords='monitoring linux systemd slack development',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    install_requires=['slackclient', 'boto3', 'psutil'],
+    install_requires=['slackclient', 'boto3', 'psutil', 'pyCLI'],
     package_data={  # Optional
         'sample': ['config.ini'],
     },
