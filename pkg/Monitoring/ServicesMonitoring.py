@@ -16,13 +16,12 @@
     If you don't want to respect any of these points, please rewrite this tool immediately !
 """
 
-import socket
 import subprocess
 from datetime import datetime, timedelta
 from time import sleep
 
 # Import custom classes
-from Notifications.Slack import SlackNotification
+from Notifications.NotificationManager import NotificationManager
 
 
 class ServicesMonitoring:
@@ -43,10 +42,10 @@ class ServicesMonitoring:
             failing_units = int(failing_process.stdout.read().decode('UTF-8').strip())
             failing_process.stdout.close()
             if failing_units == 0:
-                error_msg = '@canal :bangbang: *System is unstable* but I don\'t detect any failed service.\n\n' \
+                error_msg = '@channel :bangbang: *System is unstable* but I don\'t detect any failed service.\n\n' \
                             'Current status is «' + status + '»'
             else:
-                error_msg = '@canal :bangbang: *Server is unstable* '+"\n"
+                error_msg = '@channel :bangbang: *Server is unstable* '+"\n"
                 failed_process = subprocess.Popen("systemctl --failed | grep failed | awk '{print $2}'", shell=True,
                                                   stdout=subprocess.PIPE)
                 failed_units = failed_process.stdout.read().decode('UTF-8').strip()
@@ -80,7 +79,8 @@ class ServicesMonitoring:
                         error_msg += '- ' + unit + "\n"
 
             # Sending notification
-            self.send_notification(error_msg)
+            notification = NotificationManager()
+            notification.send_notification(error_msg)
 
 
     @staticmethod
@@ -111,7 +111,3 @@ class ServicesMonitoring:
             self.relaunch_status = True
         unit_status_process.stdout.close()
         return relaunch_message
-
-    def send_notification(self, message):
-        slack = SlackNotification()
-        print(slack.pingCanal(message, 'devnotif'))

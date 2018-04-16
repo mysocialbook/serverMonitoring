@@ -8,7 +8,7 @@ import os
 import socket
 
 from Tools.System import System
-from Notifications.Slack import SlackNotification
+from Notifications.NotificationManager import NotificationManager
 
 
 class LoadMonitoring:
@@ -29,8 +29,8 @@ class LoadMonitoring:
     def display_status_message(self):
         message = ':info: *Server ' + socket.gethostname() + '*'
         message += self.get_status_message()
-        slack = SlackNotification()
-        slack.pingCanal(message, 'devnotif')
+        notification = NotificationManager()
+        notification.send_notification(message)
 
     def get_status_message(self):
         status_msg = "\n *Status* \n"
@@ -45,5 +45,5 @@ class LoadMonitoring:
 
     def trigger_alarm(self, message):
         message = ':warn: *Server ' + socket.gethostname() + '* is in danger zone ' + message
-        slack = SlackNotification()
-        slack.pingCanal(message, 'devnotif')
+        notification = NotificationManager()
+        notification.send_notification(message)
