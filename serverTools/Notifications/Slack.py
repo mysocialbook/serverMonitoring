@@ -25,4 +25,4 @@ class Slack:
             channel = self.default_channel
         if channel[0] != '#':
             channel = '#' + channel
-        print(self.client.api_call("chat.postMessage", link_names=int(self.allow_ping), channel=channel, text=message))
+        self.client.api_call("chat.postMessage", link_names=int(self.allow_ping), channel=channel, text=message)
