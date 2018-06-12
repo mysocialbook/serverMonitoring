@@ -17,6 +17,7 @@
 """
 
 import subprocess
+import socket
 from datetime import datetime, timedelta
 from time import sleep
 
@@ -44,7 +45,8 @@ class ServicesMonitoring:
             failing_units = int(failing_process.stdout.read().decode('UTF-8').strip())
             failing_process.stdout.close()
             if failing_units == 0:
-                error_msg = '@channel :bangbang: *System is unstable* but I don\'t detect any failed service.\n\n' \
+                error_msg = '@channel :bangbang: *System is unstable for server ' + socket.gethostname() +\
+                            '* but I don\'t detect any failed service.\n\n' \
                             'Current status is «' + status + '»'
             else:
                 error_msg = '@channel :bangbang: *Server is unstable* '+"\n"
