@@ -10,7 +10,7 @@ parser.add_argument('type', metavar='Context', type=str,
                    help='The context')
 
 args = parser.parse_args()
-message = '@channel :info: *Server ' + socket.gethostname() + ' '
+message = '@channel :info: *Server ' + socket.gethostname() + '* '
 
 if args.type == 'boot':
     message += 'has just booted.  Deployment notification should arrive soon in this channel'
@@ -26,4 +26,4 @@ print(args.type)
 
 slack_token = os.environ["SLACK_API_TOKEN"]
 slack = SlackClient(slack_token)
-print(slack.api_call("chat.postMessage", channel="#servernotifs", text=message))
+print(slack.api_call("chat.postMessage", link_names=1, channel="#servernotifs", text=message))
