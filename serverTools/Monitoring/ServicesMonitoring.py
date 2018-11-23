@@ -49,7 +49,7 @@ class ServicesMonitoring:
                             '* but I don\'t detect any failed service.\n\n' \
                             'Current status is «' + status + '»'
             else:
-                error_msg = '@channel :bangbang: *Server is unstable* '+"\n"
+                error_msg = '@channel :bangbang: *Server ' + socket.gethostname() + ' is unstable* '+"\n"
                 failed_process = subprocess.Popen("systemctl --failed | grep failed | awk '{print $2}'", shell=True,
                                                   stdout=subprocess.PIPE)
                 failed_units = failed_process.stdout.read().decode('UTF-8').strip()
