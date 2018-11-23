@@ -4,6 +4,8 @@
 
 import os
 from slackclient import SlackClient
+import distutils
+from distutils import util
 
 
 class Slack:
@@ -18,7 +20,7 @@ class Slack:
             print('NOTICE: missing default Slack channel.  Choosing #general')
         else:
             self.default_channel = config['DefaultChannel']
-        self.allow_ping = bool(config['AllowPing'])
+        self.allow_ping = distutils.util.strtobool(config['AllowPing'])
 
     def ping_channel(self, message, channel=''):
         if channel == '':

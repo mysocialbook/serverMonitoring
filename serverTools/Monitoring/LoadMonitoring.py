@@ -4,8 +4,9 @@
     This script monitor the the load of the server and trigger and alarm if a value is too high
 """
 
-import os
 import socket
+import distutils
+from distutils import util
 
 from Tools.System import System
 
@@ -17,14 +18,14 @@ class LoadMonitoring:
 
         # Check disk space
         if System.get_free_disk_space('/') < (System.get_total_disk_space('/')/5):
-            self.trigger_alarm('*Disk space* is too low.  Only ' + str(System.get_free_disk_space('/') // (2**30)) +
+            self.trigger_alarm('*Disk space* is too low. on instance ' + socket.gethostname() + '.  Only ' + str(System.get_free_disk_space('/') // (2**30)) +
                                'GB are left')
         # Check load average
         one_minute, five_minutes, fifteen_minutes = System.get_load_average()
         if five_minutes > System.get_cpu_count():
             self.trigger_alarm('*Overload detected*  Load of ' + str(five_minutes) + ' for max of ' + str(System.get_cpu_count()))
 
-        if 'SendNotificationIfNoError' in config and bool(config['SendNotificationIfNoError']):
+        if 'SendNotificationIfNoError' in config and distutils.util.strtobool(config['SendNotificationIfNoError']):
             self.display_status_message()
 
     def display_status_message(self):

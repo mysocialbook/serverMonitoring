@@ -20,6 +20,8 @@ import subprocess
 import socket
 from datetime import datetime, timedelta
 from time import sleep
+import distutils
+from distutils import util
 
 # Import custom classes
 from Notifications.NotificationManager import NotificationManager
@@ -49,7 +51,7 @@ class ServicesMonitoring:
                             '* but I don\'t detect any failed service.\n\n' \
                             'Current status is «' + status + '»'
             else:
-                error_msg = '@channel :bangbang: *Server is unstable* '+"\n"
+                error_msg = '@channel :bangbang: *Server ' + socket.gethostname() + ' is unstable* '+"\n"
                 failed_process = subprocess.Popen("systemctl --failed | grep failed | awk '{print $2}'", shell=True,
                                                   stdout=subprocess.PIPE)
                 failed_units = failed_process.stdout.read().decode('UTF-8').strip()
@@ -59,7 +61,7 @@ class ServicesMonitoring:
                 error_msg += 'Following units are in «failed» state:\n'
 
                 relaunch_toggle = False
-                if 'RelaunchJobs' in config and config['RelaunchJobs'] == 'yes':
+                if 'RelaunchJobs' in config and distutils.util.strtobool(config['RelaunchJobs']):
                     relaunch_toggle = True
 
                 for unit in failed_units:
