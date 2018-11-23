@@ -4,8 +4,9 @@
     This script monitor the the load of the server and trigger and alarm if a value is too high
 """
 
-import os
 import socket
+import distutils
+from distutils import util
 
 from Tools.System import System
 
@@ -24,7 +25,7 @@ class LoadMonitoring:
         if five_minutes > System.get_cpu_count():
             self.trigger_alarm('*Overload detected*  Load of ' + str(five_minutes) + ' for max of ' + str(System.get_cpu_count()))
 
-        if 'SendNotificationIfNoError' in config and bool(config['SendNotificationIfNoError']):
+        if 'SendNotificationIfNoError' in config and distutils.util.strtobool(config['SendNotificationIfNoError']):
             self.display_status_message()
 
     def display_status_message(self):

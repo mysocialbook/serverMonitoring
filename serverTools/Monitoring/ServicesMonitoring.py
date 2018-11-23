@@ -20,6 +20,8 @@ import subprocess
 import socket
 from datetime import datetime, timedelta
 from time import sleep
+import distutils
+from distutils import util
 
 # Import custom classes
 from Notifications.NotificationManager import NotificationManager
@@ -59,7 +61,7 @@ class ServicesMonitoring:
                 error_msg += 'Following units are in «failed» state:\n'
 
                 relaunch_toggle = False
-                if 'RelaunchJobs' in config and config['RelaunchJobs'] == 'yes':
+                if 'RelaunchJobs' in config and distutils.util.strtobool(config['RelaunchJobs']):
                     relaunch_toggle = True
 
                 for unit in failed_units:
