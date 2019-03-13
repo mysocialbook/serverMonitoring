@@ -22,7 +22,7 @@ class LoadMonitoring:
                                'GB are left')
         if (System.get_free_disk_space('/') // (2**30)) < 20:
             self.trigger_alarm('@channel :bangbang: Disk space is critical on instance ' + socket.gethostname() +
-                               '.  Only ' + str(System.get_free_disk_space('/') // (2**30))) + 'GB remaining'
+                               '.  Only ' + str(System.get_free_disk_space('/') // (2**30)) + 'GB remaining')
 
         # Check load average
         one_minute, five_minutes, fifteen_minutes = System.get_load_average()
