@@ -1,7 +1,6 @@
-import os
-
 from Notifications.Slack import Slack
 from Notifications.SES import SES
+
 
 class NotificationManager:
     def __init__(self, config):

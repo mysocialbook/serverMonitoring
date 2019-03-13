@@ -1,13 +1,14 @@
 from Monitoring import LoadMonitoring, ServicesMonitoring
 from Tools import ConfigLoader
-from Notifications.NotificationManager import NotificationManager
+from Notifications import NotificationManager
 
 import cli.app
+
 
 @cli.app.CommandLineApp
 def monitor(app):
     config = ConfigLoader.ConfigLoader(app.params.config)
-    notifier = NotificationManager(config)
+    notifier = NotificationManager.NotificationManager(config)
     LoadMonitoring.LoadMonitoring(config.get_section('LoadMonitoring'), notifier)
     ServicesMonitoring.ServicesMonitoring(config.get_section('ServicesMonitoring'), notifier)
 

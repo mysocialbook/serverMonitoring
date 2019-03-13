@@ -20,9 +20,12 @@ class LoadMonitoring:
         if System.get_free_disk_space('/') < (System.get_total_disk_space('/')/5):
             self.trigger_alarm('*Disk space* is too low on instance ' + socket.gethostname() + '.  Only ' + str(System.get_free_disk_space('/') // (2**30)) +
                                'GB are left')
-        if (System.get_free_disk_space('/') // (2**30)) < 20:
+        disk_space = 20
+        if 'MinimalDiskSpace' in config and int(config['MinimalDiskSpace']):
+            disk_space = 20 if int(config['MinimalDiskSpace']) > 20 else int(config['MinimalDiskSpace'])
+        if (System.get_free_disk_space('/') // (2**30)) < disk_space:
             self.trigger_alarm('@channel :bangbang: Disk space is critical on instance ' + socket.gethostname() +
-                               '.  Only ' + str(System.get_free_disk_space('/') // (2**30))) + 'GB remaining'
+                               '.  Only ' + str(System.get_free_disk_space('/') // (2**30)) + 'GB remaining')
 
         # Check load average
         one_minute, five_minutes, fifteen_minutes = System.get_load_average()
