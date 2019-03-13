@@ -22,7 +22,7 @@ class LoadMonitoring:
                                'GB are left')
         disk_space = 20
         if 'MinimalDiskSpace' in config and int(config['MinimalDiskSpace']):
-            disk_space = int(config['MinimalDiskSpace'])
+            disk_space = 20 if int(config['MinimalDiskSpace']) > 20 else int(config['MinimalDiskSpace'])
         if (System.get_free_disk_space('/') // (2**30)) < disk_space:
             self.trigger_alarm('@channel :bangbang: Disk space is critical on instance ' + socket.gethostname() +
                                '.  Only ' + str(System.get_free_disk_space('/') // (2**30)) + 'GB remaining')
